@@ -1,10 +1,8 @@
-import { combineReducers } from 'redux';
-
 const savedContacts = window.localStorage.getItem('contacts');
 
 const contactsInitialState = savedContacts ? JSON.parse(savedContacts) : [];
 
-const contactsReducer = (state = contactsInitialState, action) => {
+export const contactsReducer = (state = contactsInitialState, action) => {
   switch (action.type) {
     case 'contacts/addContact': {
       const contacts = [...state, action.payload];
@@ -25,7 +23,7 @@ const filtersInitialState = {
   name: '',
 };
 
-const filtersReducer = (state = filtersInitialState, action) => {
+export const filtersReducer = (state = filtersInitialState, action) => {
   switch (action.type) {
     case 'filters/setNameFilter': {
       return {
@@ -37,8 +35,3 @@ const filtersReducer = (state = filtersInitialState, action) => {
       return state;
   }
 };
-
-export const rootReducer = combineReducers({
-  contacts: contactsReducer,
-  filters: filtersReducer,
-});
