@@ -1,15 +1,17 @@
+import { addContact, deleteContact, setNameFilter } from './actions';
+
 const savedContacts = window.localStorage.getItem('contacts');
 
 const contactsInitialState = savedContacts ? JSON.parse(savedContacts) : [];
 
 export const contactsReducer = (state = contactsInitialState, action) => {
   switch (action.type) {
-    case 'contacts/addContact': {
+    case addContact.type: {
       const contacts = [...state, action.payload];
       window.localStorage.setItem('contacts', JSON.stringify(contacts));
       return contacts;
     }
-    case 'contacts/deleteContact': {
+    case deleteContact.type: {
       const contacts = state.filter(({ id }) => id !== action.payload);
       window.localStorage.setItem('contacts', JSON.stringify(contacts));
       return contacts;
@@ -25,7 +27,7 @@ const filtersInitialState = {
 
 export const filtersReducer = (state = filtersInitialState, action) => {
   switch (action.type) {
-    case 'filters/setNameFilter': {
+    case setNameFilter.type: {
       return {
         ...state,
         name: action.payload,
