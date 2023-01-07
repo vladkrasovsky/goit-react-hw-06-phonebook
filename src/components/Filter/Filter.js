@@ -1,23 +1,27 @@
-import PropTypes from 'prop-types';
-import Control from 'components/ContactForm/Control';
+import { useSelector, useDispatch } from 'react-redux';
+import { getContacts } from 'redux/selectors';
+import { setNameFilter } from 'redux/actions';
 
-const Filter = ({ value, onFilter }) => {
+const Filter = () => {
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
+
   const handleChange = e => {
-    onFilter(e.currentTarget.value);
+    dispatch(setNameFilter(e.target.value));
   };
 
-  return (
-    <Control
-      label="Find contacts by name"
-      value={value}
-      onChange={handleChange}
-    />
-  );
-};
+  // do not show filter without contacts
+  if (contacts.length === 0) {
+    return null;
+  }
 
-Filter.propTypes = {
-  value: PropTypes.string.isRequired,
-  onFilter: PropTypes.func.isRequired,
+  return (
+    <>
+      <label>Find contacts by name</label>
+      <br />
+      <input onChange={handleChange} />
+    </>
+  );
 };
 
 export default Filter;

@@ -1,75 +1,61 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/actions';
+import { getContacts } from 'redux/selectors';
 import { Form } from './ContactForm.styled';
-import Control from './Control';
 
-const formFields = {
-  name: 'name',
-  number: 'number',
-};
+const ContactForm = () => {
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
 
-const ContactForm = ({ onSubmit }) => {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-
-  const resetForm = () => {
-    setName('');
-    setNumber('');
-  };
-
-  const handleInputChange = e => {
-    const { name, value } = e.currentTarget;
-
-    switch (name) {
-      case formFields.name:
-        setName(value);
-        break;
-      case formFields.number:
-        setNumber(value);
-        break;
-      default:
-        throw new Error('Unsupported form field');
-    }
-  };
+  const checkIsInContacts = newName =>
+    contacts.some(({ name }) => name.toLowerCase() === newName.toLowerCase());
 
   const handleSubmit = e => {
     e.preventDefault();
-    const isSuccess = onSubmit(name, number);
+    const form = e.target;
+    const name = form.name.value;
+    const number = form.number.value;
 
-    if (!isSuccess) return;
-    resetForm();
+    const isInContacts = checkIsInContacts(name);
+
+    // don't add new contact when the name already exists
+    if (isInContacts) {
+      alert(`"${name}" is already in contacts.`);
+      return;
+    }
+
+    dispatch(addContact(name, number));
+    form.reset();
   };
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Control
-        label="Name"
-        value={name}
-        onChange={handleInputChange}
-        name={formFields.name}
-        pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-        title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-        required={true}
-      />
+      <div>
+        <label>Name</label>
+        <br />
+        <input
+          name="name"
+          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+          required={true}
+        />
+      </div>
 
-      <Control
-        label="Number"
-        value={number}
-        onChange={handleInputChange}
-        type="tel"
-        name={formFields.number}
-        pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-        title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-        required={true}
-      />
+      <div>
+        <label>Number</label>
+        <br />
+        <input
+          type="tel"
+          name="number"
+          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+          required={true}
+        />
+      </div>
 
       <button type="submit">Add contact</button>
     </Form>
   );
-};
-
-ContactForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
 };
 
 export default ContactForm;

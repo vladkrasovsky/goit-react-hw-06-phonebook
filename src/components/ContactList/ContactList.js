@@ -1,28 +1,34 @@
-import PropTypes from 'prop-types';
-import ContactListItem from './ContactListItem';
+import { useSelector } from 'react-redux';
+import { getContacts, getNameFilter } from 'redux/selectors';
+import Contact from '../Contact/Contact';
+import Notification from '../Notification';
 import { List } from './ContactList.styled';
 
-const ContactList = ({ contacts, onDelete }) => (
-  <List>
-    {contacts.map(({ id, name, number }) => (
-      <ContactListItem
-        key={id}
-        contact={{ id, name, number }}
-        onDelete={onDelete}
-      />
-    ))}
-  </List>
-);
+const getVisibleContacts = (contacts, nameFilter) => {
+  const normalizedFilter = nameFilter.toLowerCase();
+  return contacts.filter(contact =>
+    contact.name.toLowerCase().includes(normalizedFilter)
+  );
+};
 
-ContactList.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  onDelete: PropTypes.func.isRequired,
+const ContactList = () => {
+  const contacts = useSelector(getContacts);
+  const nameFilter = useSelector(getNameFilter);
+  const visibleContacts = getVisibleContacts(contacts, nameFilter);
+
+  if (visibleContacts.length === 0) {
+    return <Notification message="There is no contacts" />;
+  }
+
+  return (
+    <List>
+      {visibleContacts.map(contact => (
+        <li key={contact.id}>
+          <Contact contact={contact} />
+        </li>
+      ))}
+    </List>
+  );
 };
 
 export default ContactList;
