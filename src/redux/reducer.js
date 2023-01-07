@@ -25,9 +25,6 @@ const filtersInitialState = {
 
 export const filtersReducer = createReducer(filtersInitialState, builder => {
   builder.addCase(setNameFilter, (state, action) => {
-    return {
-      ...state,
-      name: action.payload,
-    };
+    state.name = action.payload;
   });
 });
